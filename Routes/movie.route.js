@@ -92,7 +92,7 @@ movie.get('/',async (req,res)=>{
 
     const {page,perPage,sortType,sort}=req.query;
     let sortTypeValue=(sortType=="ASC"?1:sortType=="DSC"?-1:1);
-    let skip=page*perPage-1;
+    let skip=(page*perPage)-perPage;
     const moviedata=await Movie.find().sort({[sort]:sortTypeValue}).skip(skip).limit(perPage);
     return res.send(moviedata);
 })
