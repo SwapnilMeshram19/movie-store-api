@@ -90,12 +90,19 @@ movie.get('/id/:id',async (req,res)=>{
 
 movie.get('/',async (req,res)=>{
 
-    const {page,perPage,sortType,sort}=req.query;
+    const {page,perPage,sortType,sort,q}=req.query;
+
+    if(q){
+        const moviedata=await Movie.find({"Title":{"$regex":q,"$options":"i"}});
+        return res.send(moviedata)
+    }
     let sortTypeValue=(sortType=="ASC"?1:sortType=="DSC"?-1:1);
     let skip=(page*perPage)-perPage;
     const moviedata=await Movie.find().sort({[sort]:sortTypeValue}).skip(skip).limit(perPage);
     return res.send(moviedata);
 })
+
+
 
 
 module.exports = movie;
