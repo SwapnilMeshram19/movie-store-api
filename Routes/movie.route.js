@@ -42,8 +42,58 @@ movie.post('/',async (req,res)=>{
    }
 })
 
+movie.put('/:id',async (req,res)=>{
+    try{
+         const id=req.params.id;
+        
+         const movie=req.body;
+         console.log(movie)
+         const {Title,Year,Realeased,Runtime,Genre,imdbRating,Language,Country}=movie;
+         let data={
+             Title,
+             Year,
+             Realeased,
+             Runtime,
+             Genre,
+             imdbRating,
+             Language,
+             Country
+         }
+         const moviedata=await Movie.updateOne({"_id":{"$eq":id}},data);
+         return res.send("data Update Successfully");
+    }catch(error){
+     console.log(error);
+     return res.status(500).send("internal server error");
+    }
+ })
+
+// movie.get('/',async (req,res)=>{
+//     const moviedata=await Movie.find();
+//     return res.send(moviedata);
+// })
+
+
+movie.delete('/:id',async (req,res)=>{
+    const id=req.params.id;
+    const moviedata=await Movie.deleteOne({"_id":{"$eq":id}});
+    return res.send("Movie has been Deleted")
+})
+
+movie.get('/name/:name',async (req,res)=>{
+    const moviedata=await Movie.findOne({"Title":{"$regex":req.params.name,"$options":"i"}});
+    return res.send(moviedata)
+})
+movie.get('/id/:id',async (req,res)=>{
+    const moviedata=await Movie.findOne({"_id":{"$eq":req.params.id}});
+    return res.send(moviedata);
+})
+
 movie.get('/',async (req,res)=>{
-    const moviedata=await Movie.find();
+
+    const {page,perPage,sortType,sort}=req.query;
+    let sortTypeValue=(sortType=="ASC"?1:sortType=="DSC"?-1:1);
+    let skip=page*perPage-1;
+    const moviedata=await Movie.find().sort({[sort]:sortTypeValue}).skip(skip).limit(perPage);
     return res.send(moviedata);
 })
 
